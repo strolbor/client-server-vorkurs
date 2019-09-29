@@ -2,31 +2,36 @@ package com.jds.vorkurs.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-public class GameServer implements Server {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import com.jds.vorkurs.shared.Player;
+
+public class GameServer implements Server, Glue {
+	private static final Logger LOGGER = LogManager.getLogger(GameServer.class);
 	private ServerSocket serverSocket;
-	private List<ClientHandler> clientHandler = new ArrayList<>();
+
+	private Map<Player, ClientHandler> clients = new HashMap<Player, ClientHandler>();
 
 	@Override
 	public void start(int port) {
-		System.out.println("Starting Server on port: " + port);
+		LOGGER.info("Starting Server on port: " + port);
 		try {
 			serverSocket = new ServerSocket(port);
-			System.out.println("Server up, start listening for clients");
+			LOGGER.info("Server up, start listening for clients");
 			while (true) {
-				ClientHandler handler = new ClientHandler(serverSocket.accept());
-				handler.start();
-				clientHandler.add(handler);
+				ClientHandler handler = new ClientHandler(serverSocket.accept(), this);
+				handler.run();
 			}
 		} catch (IOException e) {
-			System.err.println("Could not start server " + e.getMessage());
+			LOGGER.error("Could not start server " + e.getMessage());
 		} finally {
 			stop();
 		}
-
 	}
 
 	@Override
@@ -34,12 +39,24 @@ public class GameServer implements Server {
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.warn("Error while closing the server connection", e);
 		}
 	}
 
-//	public static void main(String[] args) {
-//		new GameServer().start(8443);
-//	}
+	public static void main(String[] args) {
+		new GameServer().start(8443);
+	}
 
+	@Override
+	public String registerNewUser(Player player, ClientHandler clientHandler) {
+		String clientId = UUID.randomUUID().toString();
+		player.setId(clientId);
+		clients.put(player, clientHandler);
+		return clientId;
+	}
+
+	@Override
+	public void unregisterUser(Player player) {
+		clients.remove(player);
+	}
 }

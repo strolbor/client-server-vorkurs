@@ -7,11 +7,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.Gson;
-import com.jds.vorkurs.shared.Command;
 import com.jds.vorkurs.shared.Message;
 
 public class GameClient {
+
+	private static final Logger LOGGER = LogManager.getLogger(GameClient.class);
 
 	private Socket clientSocket;
 	private PrintWriter out;
@@ -20,17 +24,20 @@ public class GameClient {
 	public void startConnection(String ip, int port) {
 		try {
 			clientSocket = new Socket(ip, port);
-			out = new PrintWriter(clientSocket.getOutputStream(),true,StandardCharsets.UTF_8);
+			out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Error while setting up the communication", e);
 		}
 	}
 
-	public Message sendMessage(Message msg) throws IOException {
+	public <T> T sendMessage(Message msg, Class<T> returnType) throws IOException {
 		out.println(new Gson().toJson(msg));
-		return new Gson().fromJson(in.readLine(), Message.class);
+		return new Gson().fromJson(in.readLine(), returnType);
+	}
+
+	public void sendCommand(Message message) {
+		out.println(new Gson().toJson(message));
 	}
 
 	public void stopConnection() throws IOException {
@@ -43,13 +50,6 @@ public class GameClient {
 		GameClient client = new GameClient();
 		addShutDownHook(client);
 		client.startConnection("127.0.0.1", 8443);
-		try {
-			Message response = client.sendMessage(new Message(Command.MESSAGE, "Message"));
-			System.out.println(response);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private static void addShutDownHook(GameClient client) {
@@ -59,7 +59,7 @@ public class GameClient {
 				try {
 					client.stopConnection();
 				} catch (IOException e) {
-					System.err.println("Could not close client connection");
+					LOGGER.error("Could not close client connection", e);
 				}
 			}
 		});

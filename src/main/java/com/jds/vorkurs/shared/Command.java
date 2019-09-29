@@ -1,5 +1,5 @@
 package com.jds.vorkurs.shared;
 
 public enum Command {
-	CONNECT, DISCONNECT, MESSAGE
+	CONNECT,CONNECTED, DISCONNECT, MESSAGE, ERROR
 }

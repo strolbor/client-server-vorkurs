@@ -7,13 +7,11 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Message implements Serializable{
-	
+public class Message implements Serializable {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5525242340331171031L;
 	private Command command;
-	private String message;
-	
 }
