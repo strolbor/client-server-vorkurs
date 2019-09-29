@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.jds.vorkurs.shared.Player;
 
-public class GameServer implements Server, Glue {
+public class GameServer implements Server, HandlerAdapter {
 	private static final Logger LOGGER = LogManager.getLogger(GameServer.class);
 	private ServerSocket serverSocket;
 

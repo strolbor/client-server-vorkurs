@@ -24,9 +24,9 @@ public class ClientHandler extends Thread {
 	private BufferedReader in;
 	private PrintWriter out;
 
-	private Glue serverGlue;
+	private HandlerAdapter serverGlue;
 
-	public ClientHandler(Socket clientSocket, Glue serverGlue) {
+	public ClientHandler(Socket clientSocket, HandlerAdapter serverGlue) {
 		this.clientSocket = clientSocket;
 		this.serverGlue = serverGlue;
 	}

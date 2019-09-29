@@ -2,7 +2,7 @@ package com.jds.vorkurs.server;
 
 import com.jds.vorkurs.shared.Player;
 
-public interface Glue {
+public interface HandlerAdapter {
 	/**
 	 * register a new client on the game Server, generating a unique id for him
 	 * 
