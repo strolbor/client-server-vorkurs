@@ -17,6 +17,8 @@ import com.jds.vorkurs.shared.ErrorMessage;
 import com.jds.vorkurs.shared.Message;
 import com.jds.vorkurs.shared.Player;
 
+import de.urs.game.schereSteinPapier.WillkommenMessage;
+
 public class ClientHandler extends Thread {
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
 
@@ -52,6 +54,8 @@ public class ClientHandler extends Thread {
 					break;
 				case CONNECTED:
 					// Sending informations about lobbys, ping etc.
+					WillkommenMessage welcome = new Gson().fromJson(in.readLine(), WillkommenMessage.class);
+					out.println(welcome);
 					break;
 				case MESSAGE:
 				case DISCONNECT:

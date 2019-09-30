@@ -1,8 +1,6 @@
 package com.jds.vorkurs.shared;
 
-import lombok.Data;
 
-@Data
 public class DisconnectMessage extends Message {
 
 	/**

@@ -48,7 +48,7 @@ public class GameIntegrationTest {
 		ConnectMessage message = new ConnectMessage(player);
 		String playerId = gameClient.sendMessage(message, String.class);
 		player.setId(playerId);
-		assertTrue(!playerId.isBlank());
+		assertTrue(!playerId.isEmpty());
 	}
 
 	@After
