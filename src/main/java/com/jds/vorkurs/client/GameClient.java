@@ -16,7 +16,9 @@ import com.jds.vorkurs.shared.ConnectMessage;
 import com.jds.vorkurs.shared.Message;
 import com.jds.vorkurs.shared.Player;
 
-import de.urs.game.schereSteinPapier.WillkommenMessage;
+import de.urs.game.schereSteinPapier.ChooseMessage;
+import de.urs.game.schereSteinPapier.Spiel;
+
 
 public class GameClient {
 
@@ -25,6 +27,7 @@ public class GameClient {
 	private Socket clientSocket;
 	private PrintWriter out;
 	private BufferedReader in;
+	//private static Spiel spiel;
 
 	public void startConnection(String ip, int port) {
 		try {
@@ -52,49 +55,43 @@ public class GameClient {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Willkommen bleim Client 0.1!");
-		System.out.println("Wie heiﬂen Sie?");
-		Scanner sc = new Scanner(System.in);
-		String UserName = sc.nextLine();
-		System.out.println("Hallo "+UserName+"!");
-		
+		System.out.println("Willkommen bleim Client 0.2!");
+		Spiel spiel = new Spiel();
+		spiel.initPlayer();
+		spiel.inputName();
 		
 		GameClient client = new GameClient();
 		addShutDownHook(client);
 		client.startConnection("127.0.0.1", 8443);
-		
-		//Meinen Quelltext
-		//Player initialisieren
-		System.out.println("Player init");
-		Player p = new Player();
-		p.setName(UserName);
-		ConnectMessage message = new ConnectMessage(p);
+
+		ConnectMessage message = new ConnectMessage(spiel.getpMensch());
 		String playerId = null;
 		try {
+			
 			playerId = client.sendMessage(message, String.class);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			//System.exit(1);
+		}
+		spiel.getpMensch().setId(playerId);
+		
+		spiel.WelcomeMessage();
+		spiel.HumanInput();
+		
+		ChooseMessage cm = new ChooseMessage();
+		int Gegner = 0;
+		try {
+			Gegner = client.sendMessage(cm, Integer.class);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		p.setId(playerId);
-		
-		//Wellcome message
-		System.out.println("Willkommen");
-		WillkommenMessage wm = new WillkommenMessage();
-		WillkommenMessage a =null;
-		try {
-			a = client.sendMessage(wm, WillkommenMessage.class);
-		}catch(IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println(a.getWillkommen());
-		
-		try {
-			Thread.sleep(5*1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		spiel.enemy(Gegner);
+		spiel.pickWinner();
+		System.err.println("Nichts gesendet");
+
 	}
 
 	private static void addShutDownHook(GameClient client) {

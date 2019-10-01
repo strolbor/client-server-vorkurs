@@ -11,13 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
-import com.jds.vorkurs.shared.Command;
 import com.jds.vorkurs.shared.ConnectMessage;
-import com.jds.vorkurs.shared.ErrorMessage;
 import com.jds.vorkurs.shared.Message;
-import com.jds.vorkurs.shared.Player;
-
-import de.urs.game.schereSteinPapier.WillkommenMessage;
 
 public class ClientHandler extends Thread {
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
@@ -54,10 +49,11 @@ public class ClientHandler extends Thread {
 					break;
 				case CONNECTED:
 					// Sending informations about lobbys, ping etc.
-					WillkommenMessage welcome = new Gson().fromJson(in.readLine(), WillkommenMessage.class);
-					out.println(welcome);
+					
 					break;
 				case MESSAGE:
+					
+					break;
 				case DISCONNECT:
 					LOGGER.info("Received shutdown message, starting teardown for client");
 					// close all
@@ -74,4 +70,5 @@ public class ClientHandler extends Thread {
 			LOGGER.error("There was an communication error", e);
 		}
 	}
+	
 }
