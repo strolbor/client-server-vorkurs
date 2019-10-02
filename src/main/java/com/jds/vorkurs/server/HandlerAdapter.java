@@ -18,4 +18,10 @@ public interface HandlerAdapter {
 	 * @param player the client/ player that has to be removed
 	 */
 	void unregisterUser(Player player);
+	
+	void givePlayer(Player player);
+	
+	Player getEnemyPlayer(Player player);
+	
+
 }

@@ -16,6 +16,7 @@ public class GameServer implements Server, HandlerAdapter {
 	private ServerSocket serverSocket;
 
 	private Map<Player, ClientHandler> clients = new HashMap<Player, ClientHandler>();
+	Player p1=null,p2=null;
 
 	@Override
 	public void start(int port) {
@@ -25,7 +26,7 @@ public class GameServer implements Server, HandlerAdapter {
 			LOGGER.info("Server up, start listening for clients");
 			while (true) {
 				ClientHandler handler = new ClientHandler(serverSocket.accept(), this);
-				handler.run();
+				handler.start();
 			}
 		} catch (IOException e) {
 			LOGGER.error("Could not start server " + e.getMessage());
@@ -58,5 +59,41 @@ public class GameServer implements Server, HandlerAdapter {
 	@Override
 	public void unregisterUser(Player player) {
 		clients.remove(player);
+	}
+
+	public Player getP1() {
+		return p1;
+	}
+
+	public void setP1(Player p1) {
+		this.p1 = p1;
+	}
+
+	public Player getP2() {
+		return p2;
+	}
+
+	public void setP2(Player p2) {
+		this.p2 = p2;
+	}
+
+	
+	public void givePlayer(Player player) {
+		if(p1 == null) {
+			p1 = player;
+		}else if(p2 == null && p1 !=null) {
+			p2 = player;
+		}
+	}
+
+	@Override
+	public Player getEnemyPlayer(Player player) {
+		if(player == p1) {
+			return p2;
+		}else if(player == p2) {
+			return p1;
+		}else {
+			return null;	
+		}
 	}
 }

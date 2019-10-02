@@ -5,14 +5,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Random;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.google.gson.Gson;
 import com.jds.vorkurs.shared.ConnectMessage;
 import com.jds.vorkurs.shared.Message;
+import com.jds.vorkurs.shared.Player;
+import com.jds.vorkurs.shared.RegisterMessage;
+
+import de.urs.game.schereSteinPapier.SendEnemyMessage;
 
 public class ClientHandler extends Thread {
 	private static final Logger LOGGER = LogManager.getLogger(ClientHandler.class);
@@ -20,6 +24,8 @@ public class ClientHandler extends Thread {
 	private Socket clientSocket;
 	private BufferedReader in;
 	private PrintWriter out;
+
+
 
 	private HandlerAdapter serverGlue;
 
@@ -30,6 +36,7 @@ public class ClientHandler extends Thread {
 
 	@Override
 	public void run() {
+		
 		LOGGER.log(Level.INFO, "New Client detected on " + clientSocket.getInetAddress());
 		try {
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -50,8 +57,24 @@ public class ClientHandler extends Thread {
 				case CONNECTED:
 					// Sending informations about lobbys, ping etc.
 					
+					
+					break;
+				case SENDGEGNER:
+					SendEnemyMessage sem = new Gson().fromJson(message, SendEnemyMessage.class);
+					Player feind = serverGlue.getEnemyPlayer(sem.getPlayer());
+					if(feind.getAuswahlID() != 0) {
+						//Der Feind bin ich nicht
+						sem.setRan(feind.getAuswahlID());
+						out.println(feind.getAuswahlID());
+					}
 					break;
 				case MESSAGE:
+					
+					
+					break;
+				case REGISTER:
+					RegisterMessage rm = new Gson().fromJson(message, RegisterMessage.class);
+					serverGlue.givePlayer(rm.getPlayer());
 					
 					break;
 				case DISCONNECT:
@@ -69,6 +92,5 @@ public class ClientHandler extends Thread {
 		} catch (IOException e) {
 			LOGGER.error("There was an communication error", e);
 		}
-	}
-	
+	}	
 }

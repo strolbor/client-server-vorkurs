@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,11 +12,10 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.jds.vorkurs.shared.ConnectMessage;
 import com.jds.vorkurs.shared.Message;
-import com.jds.vorkurs.shared.Player;
+import com.jds.vorkurs.shared.RegisterMessage;
 
-import de.urs.game.schereSteinPapier.ChooseMessage;
+import de.urs.game.schereSteinPapier.SendEnemyMessage;
 import de.urs.game.schereSteinPapier.Spiel;
-
 
 public class GameClient {
 
@@ -27,7 +24,7 @@ public class GameClient {
 	private Socket clientSocket;
 	private PrintWriter out;
 	private BufferedReader in;
-	//private static Spiel spiel;
+	// private static Spiel spiel;
 
 	public void startConnection(String ip, int port) {
 		try {
@@ -55,42 +52,58 @@ public class GameClient {
 	}
 
 	public static void main(String[] args) {
+		// Spielereingaben
 		System.out.println("Willkommen bleim Client 0.2!");
 		Spiel spiel = new Spiel();
 		spiel.initPlayer();
 		spiel.inputName();
-		
+
+		// Verbindung aufbauen
 		GameClient client = new GameClient();
 		addShutDownHook(client);
 		client.startConnection("127.0.0.1", 8443);
-
+		// Verbunden Nachricht senden
 		ConnectMessage message = new ConnectMessage(spiel.getpMensch());
 		String playerId = null;
 		try {
-			
+
 			playerId = client.sendMessage(message, String.class);
-			
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			//System.exit(1);
 		}
 		spiel.getpMensch().setId(playerId);
-		
+
+		// Spiel starten
 		spiel.WelcomeMessage();
 		spiel.HumanInput();
+
+		// Spieler registieren
+		RegisterMessage rm = new RegisterMessage(spiel.getpMensch());
+		client.sendCommand(rm);
+
+		// Gegner Abfragen
 		
-		ChooseMessage cm = new ChooseMessage();
-		int Gegner = 0;
-		try {
-			Gegner = client.sendMessage(cm, Integer.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		spiel.enemy(Gegner);
-		spiel.pickWinner();
-		System.err.println("Nichts gesendet");
+		  int Gegner = 0; 
+		  do { 
+			  SendEnemyMessage sem = new
+			  SendEnemyMessage(spiel.getpMensch()); 
+			  try { 
+				  Gegner = client.sendMessage(sem, Integer.class); 
+				  Thread.sleep(5000); 
+			  } catch (IOException e) {
+					e.printStackTrace(); 
+				} catch (InterruptedException e) { 
+					e.printStackTrace();
+				} 
+		  }while(Gegner == 0);
+		  
+		  //Warten auf anderen Spieler
+		  
+		  spiel.enemy(Gegner); 
+		  spiel.pickWinner();
+		 
+		
 
 	}
 
