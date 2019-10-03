@@ -1,6 +1,5 @@
 package com.jds.vorkurs.shared;
 
-import de.urs.game.schereSteinPapier.Dinge;
 
 public class Player {
 	private String id="0";

@@ -12,10 +12,11 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.jds.vorkurs.shared.ConnectMessage;
 import com.jds.vorkurs.shared.Message;
+import com.jds.vorkurs.shared.Player;
 import com.jds.vorkurs.shared.RegisterMessage;
+import com.jds.vorkurs.shared.Spiel;
 
 import de.urs.game.schereSteinPapier.SendEnemyMessage;
-import de.urs.game.schereSteinPapier.Spiel;
 
 public class GameClient {
 
@@ -84,19 +85,25 @@ public class GameClient {
 
 		// Gegner Abfragen
 		
-		  int Gegner = 0; 
+		  Player Gegner = null; 
+		  boolean a=false;
 		  do { 
+			  System.out.println("1");
 			  SendEnemyMessage sem = new
 			  SendEnemyMessage(spiel.getpMensch()); 
 			  try { 
-				  Gegner = client.sendMessage(sem, Integer.class); 
-				  Thread.sleep(5000); 
+				  Gegner = client.sendMessage(sem, Player.class); 
+				  if(Gegner != null) {
+					  a = true;
+					  System.out.println("fertig");
+				  }
+				  Thread.sleep(1000); 
 			  } catch (IOException e) {
 					e.printStackTrace(); 
 				} catch (InterruptedException e) { 
 					e.printStackTrace();
 				} 
-		  }while(Gegner == 0);
+		  }while(!a);
 		  
 		  //Warten auf anderen Spieler
 		  

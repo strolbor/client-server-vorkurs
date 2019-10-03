@@ -62,11 +62,14 @@ public class ClientHandler extends Thread {
 				case SENDGEGNER:
 					SendEnemyMessage sem = new Gson().fromJson(message, SendEnemyMessage.class);
 					Player feind = serverGlue.getEnemyPlayer(sem.getPlayer());
-					if(feind.getAuswahlID() != 0) {
+					if(feind == null) {
+						System.err.println("Kein feind");
+					}else {
 						//Der Feind bin ich nicht
-						sem.setRan(feind.getAuswahlID());
-						out.println(feind.getAuswahlID());
+						sem.setPlayer(feind);
+						out.println(sem);
 					}
+						
 					break;
 				case MESSAGE:
 					

@@ -77,20 +77,22 @@ public class GameServer implements Server, HandlerAdapter {
 		this.p2 = p2;
 	}
 
-	
+	int zahler=0;
 	public void givePlayer(Player player) {
-		if(p1 == null) {
+		if(p1 == null && zahler == 0) {
 			p1 = player;
-		}else if(p2 == null && p1 !=null) {
+			zahler++;
+		}else if(p2 == null && zahler == 1) {
 			p2 = player;
+			zahler--;
 		}
 	}
 
 	@Override
-	public Player getEnemyPlayer(Player player) {
-		if(player == p1) {
+	public Player getEnemyPlayer(Player me) {
+		if(me == p1) {
 			return p2;
-		}else if(player == p2) {
+		}else if(me == p2) {
 			return p1;
 		}else {
 			return null;	
